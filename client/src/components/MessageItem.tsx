@@ -14,12 +14,31 @@ interface MessageItemProps {
 }
 
 const markdownComponents: any = {
-  code({ node, inline, className, children, ...props }: any) {
-    const match = /language-(\w+)/.exec(className || '')
-    const codeStr = String(children).replace(/\n$/, '')
-    if (!inline && match) {
+  code({ className, children, ...props }: any) {
+    // Inline code: `code`
+    if (props.inline) {
       return (
-        <div style={{ margin: '8px 0', borderRadius: 6, overflow: 'hidden', border: '1px solid #cddae8' }}>
+        <code style={{
+          padding: '1px 5px',
+          background: 'rgba(74,144,217,0.08)',
+          borderRadius: 3,
+          fontSize: '0.9em',
+          fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace',
+          color: '#4a90d9'
+        }}>
+          {children}
+        </code>
+      )
+    }
+
+    // Block code: ```lang\ncode\n```
+    const match = /language-(\w+)/.exec(className || '')
+    const codeStr = String(children).replace(/\n+$/, '')
+    const lang = match?.[1]
+
+    return (
+      <div style={{ margin: '8px 0', borderRadius: 6, overflow: 'hidden', border: '1px solid #cddae8' }}>
+        {lang && (
           <div style={{
             padding: '4px 12px',
             fontSize: 11,
@@ -28,50 +47,23 @@ const markdownComponents: any = {
             borderBottom: '1px solid #cddae8',
             fontFamily: 'monospace'
           }}>
-            {match[1]}
+            {lang}
           </div>
-          <SyntaxHighlighter
-            style={oneLight}
-            language={match[1]}
-            PreTag="div"
-            customStyle={{ margin: 0, borderRadius: '0 0 6px 6px', fontSize: 13 }}
-          >
-            {codeStr}
-          </SyntaxHighlighter>
-        </div>
-      )
-    }
-    if (!inline) {
-      return (
-        <code
-          style={{
-            display: 'block',
-            padding: '8px 12px',
-            background: '#eef3f8',
-            borderRadius: 6,
+        )}
+        <SyntaxHighlighter
+          style={oneLight}
+          language={lang || 'text'}
+          PreTag="div"
+          customStyle={{
+            margin: 0,
+            borderRadius: lang ? '0 0 6px 6px' : 6,
             fontSize: 13,
-            fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace',
-            color: '#2c3e4a',
-            border: '1px solid #cddae8'
+            background: lang ? undefined : '#eef3f8'
           }}
         >
-          {children}
-        </code>
-      )
-    }
-    return (
-      <code
-        style={{
-          padding: '1px 5px',
-          background: 'rgba(74,144,217,0.08)',
-          borderRadius: 3,
-          fontSize: '0.9em',
-          fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace',
-          color: '#4a90d9'
-        }}
-      >
-        {children}
-      </code>
+          {codeStr}
+        </SyntaxHighlighter>
+      </div>
     )
   },
   pre({ children }: any) {

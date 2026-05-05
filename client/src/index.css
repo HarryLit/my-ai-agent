@@ -1,3 +1,180 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* Skeuomorphic Ocean Blue Paper Theme */
+body {
+  margin: 0;
+  background: #f0f4f8;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Paper texture background */
+.paper-bg {
+  background:
+    linear-gradient(135deg, #f2f6fa 0%, #e9eff5 50%, #e4ecf4 100%);
+}
+
+/* Sidebar - deep navy */
+.sidebar-skeuo {
+  background:
+    linear-gradient(180deg, #1e3350 0%, #182a42 30%, #122036 60%, #182a42 100%);
+  border-right: 2px solid #0f1a2b;
+  box-shadow: inset 0 0 30px rgba(0,0,0,0.3), 2px 0 8px rgba(0,0,0,0.2);
+}
+
+.sidebar-skeuo ::selection {
+  background: rgba(74,144,217,0.3);
+}
+
+/* Card-style chat bubble - user */
+.msg-user {
+  background: linear-gradient(180deg, #dce6f5 0%, #cddaf0 100%);
+  border: 1px solid #b8cbe4;
+  border-radius: 16px 4px 16px 16px;
+  box-shadow:
+    0 2px 4px rgba(0,0,0,0.05),
+    0 1px 0 rgba(255,255,255,0.6) inset;
+  padding: 14px 18px;
+}
+
+/* Card-style chat bubble - assistant */
+.msg-ai {
+  background: linear-gradient(180deg, #ffffff 0%, #f7f9fc 100%);
+  border: 1px solid #cddae8;
+  border-radius: 4px 16px 16px 16px;
+  box-shadow:
+    0 3px 8px rgba(0,0,0,0.06),
+    0 1px 0 rgba(255,255,255,0.8) inset;
+  padding: 14px 18px;
+}
+
+/* Floating ink-style input area */
+.input-skeuo {
+  background: #ffffff;
+  border: 1px solid #c4d0e0;
+  border-radius: 12px;
+  box-shadow:
+    0 2px 6px rgba(0,0,0,0.04),
+    inset 0 1px 3px rgba(0,0,0,0.03);
+  transition: box-shadow 0.3s;
+}
+
+.input-skeuo:focus-within {
+  border-color: #4a90d9;
+  box-shadow:
+    0 2px 8px rgba(74,144,217,0.15),
+    inset 0 1px 3px rgba(0,0,0,0.03);
+}
+
+/* Skeuomorphic button - ocean blue */
+.btn-skeuo {
+  border: 1px solid #3a7bc8;
+  border-radius: 10px;
+  background: linear-gradient(180deg, #5a9fe0 0%, #4a90d9 50%, #3b7dd8 100%);
+  box-shadow:
+    0 3px 0 #2a5ca0,
+    0 3px 6px rgba(0,0,0,0.12);
+  color: #fff;
+  font-weight: 600;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.25);
+  transition: transform 0.1s, box-shadow 0.1s;
+}
+
+.btn-skeuo:hover {
+  background: linear-gradient(180deg, #6aaef0 0%, #55a0e8 50%, #4a8de0 100%);
+}
+
+.btn-skeuo:active {
+  transform: translateY(2px);
+  box-shadow:
+    0 1px 0 #2a5ca0,
+    0 1px 3px rgba(0,0,0,0.12);
+}
+
+.btn-skeuo:disabled {
+  border-color: #b0bcc6;
+  background: linear-gradient(180deg, #d0d9e2 0%, #c4ced8 100%);
+  box-shadow: 0 2px 0 #a0aab4;
+  color: #909aa4;
+  text-shadow: none;
+  cursor: not-allowed;
+}
+
+/* Chat header bar */
+.chat-header {
+  background: linear-gradient(180deg, #f5f8fc 0%, #ecf1f7 100%);
+  border-bottom: 1px solid #cddae8;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+
+/* Conversation item */
+.conv-item {
+  color: #c4d0e0;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  transition: background 0.2s;
+  cursor: pointer;
+}
+
+.conv-item:hover {
+  background: rgba(255,255,255,0.05);
+}
+
+.conv-item.active {
+  background: rgba(74,144,217,0.15);
+  border-left: 3px solid #5a9fe0;
+}
+
+/* Modal paper style */
+.modal-paper {
+  background: #f5f8fc;
+  border: 1px solid #cddae8;
+  border-radius: 12px;
+  box-shadow:
+    0 8px 32px rgba(0,0,0,0.15),
+    0 0 0 4px rgba(0,0,0,0.04);
+}
+
+/* Stat tag */
+.stat-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  background: rgba(74,144,217,0.06);
+  color: #5a7a9a;
+  border: 1px solid rgba(74,144,217,0.12);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0,0,0,0.1);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0,0,0,0.18);
+}
+
+/* Typing cursor animation */
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+.typing-cursor {
+  animation: blink 0.8s infinite;
+  display: inline-block;
+  width: 8px;
+  height: 16px;
+  background: #4a90d9;
+  border-radius: 2px;
+  vertical-align: middle;
+  margin-left: 2px;
+}

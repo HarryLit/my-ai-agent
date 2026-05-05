@@ -1,4 +1,4 @@
-import { useRef, useEffect } from 'react'
+import { useRef, useEffect, useLayoutEffect } from 'react'
 import { Empty } from 'antd'
 import { MessageOutlined } from '@ant-design/icons'
 import type { Message } from '../types'
@@ -13,14 +13,46 @@ interface MessageListProps {
 }
 
 export default function MessageList({ messages, streamingContent, streamStats, isStreaming, modelName }: MessageListProps) {
-  const bottomRef = useRef<HTMLDivElement>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
+  const isNearBottomRef = useRef(true)
+  const prevStreamingRef = useRef(false)
 
+  const scrollToBottom = () => {
+    const el = containerRef.current
+    if (!el) return
+    el.scrollTop = el.scrollHeight
+  }
+
+  const handleScroll = () => {
+    const el = containerRef.current
+    if (!el) return
+    isNearBottomRef.current = el.scrollHeight - el.scrollTop - el.clientHeight < 48
+  }
+
+  // Scroll to bottom on mount
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [messages, streamingContent])
+    scrollToBottom()
+  }, [])
+
+  // Scroll on updates: capture position before data changes
+  useLayoutEffect(() => {
+    if (isStreaming && !prevStreamingRef.current) {
+      isNearBottomRef.current = true
+    }
+    prevStreamingRef.current = isStreaming
+
+    if (isNearBottomRef.current) {
+      scrollToBottom()
+    }
+  }, [messages, streamingContent, isStreaming])
 
   return (
-    <div className="paper-bg" style={{ flex: 1, overflowY: 'auto', padding: '20px' }}>
+    <div
+      ref={containerRef}
+      className="paper-bg"
+      onScroll={handleScroll}
+      style={{ flex: 1, overflowY: 'auto', padding: '20px' }}
+    >
       {messages.length === 0 && !isStreaming ? (
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
           <Empty
@@ -43,7 +75,6 @@ export default function MessageList({ messages, streamingContent, streamStats, i
           )}
         </div>
       )}
-      <div ref={bottomRef} />
     </div>
   )
 }

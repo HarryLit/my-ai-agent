@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 import { Button, Input } from 'antd'
 import { SendOutlined, CloseOutlined } from '@ant-design/icons'
 
@@ -20,10 +20,25 @@ export default function InputArea({ onSend, onStop, isStreaming, disabled }: Inp
     setText('')
   }
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.ctrlKey && !e.shiftKey) {
       e.preventDefault()
       handleSend()
+    }
+    if ((e.ctrlKey || e.shiftKey) && e.key === 'Enter') {
+      e.preventDefault()
+      const ta = e.currentTarget
+      const start = ta.selectionStart
+      const end = ta.selectionEnd
+      const before = text.slice(0, start)
+      const after = text.slice(end)
+      const newValue = before + '\n' + after
+      setText(newValue)
+      // Restore cursor via native DOM after React commit
+      setTimeout(() => {
+        ta.selectionStart = start + 1
+        ta.selectionEnd = start + 1
+      }, 0)
     }
   }
 
@@ -33,15 +48,15 @@ export default function InputArea({ onSend, onStop, isStreaming, disabled }: Inp
       background: '#faf6ed',
       borderTop: '1px solid #d9d0c0'
     }}>
-      <div style={{ maxWidth: 768, margin: '0 auto', display: 'flex', gap: 10, alignItems: 'end' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
         <div className="input-skeuo" style={{ flex: 1, padding: '2px' }}>
           <TextArea
             value={text}
             onChange={e => setText(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder={disabled ? '请先选择模型' : '输入消息，Enter 发送，Shift+Enter 换行'}
+            placeholder={disabled ? '请先选择模型' : '输入消息，Enter 发送，Ctrl/Shift+Enter 换行'}
             disabled={disabled || isStreaming}
-            autoSize={{ minRows: 1, maxRows: 5 }}
+              autoSize={{ minRows: 2, maxRows: 5 }}
             style={{
               border: 'none',
               background: 'transparent',
@@ -52,13 +67,14 @@ export default function InputArea({ onSend, onStop, isStreaming, disabled }: Inp
             }}
           />
         </div>
-        {isStreaming ? (
+        <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
+          {isStreaming ? (
           <Button
             danger
             icon={<CloseOutlined />}
             onClick={onStop}
             style={{
-              height: 42,
+              height: 38,
               borderRadius: 10,
               boxShadow: '0 2px 0 #a83232',
               fontWeight: 600,
@@ -75,11 +91,12 @@ export default function InputArea({ onSend, onStop, isStreaming, disabled }: Inp
             onClick={handleSend}
             disabled={disabled || !text.trim()}
             className="btn-skeuo"
-            style={{ height: 42, borderRadius: 10, fontSize: 13, border: '1px solid #b8860b' }}
+            style={{ height: 38, borderRadius: 10, fontSize: 13, border: '1px solid #4a90d9' }}
           >
             发送
           </Button>
         )}
+        </div>
       </div>
     </div>
   )

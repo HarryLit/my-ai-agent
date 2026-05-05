@@ -27,22 +27,24 @@ body {
 .msg-user {
   background: linear-gradient(180deg, #dce6f5 0%, #cddaf0 100%);
   border: 1px solid #b8cbe4;
-  border-radius: 16px 4px 16px 16px;
+  border-radius: 12px;
   box-shadow:
     0 2px 4px rgba(0,0,0,0.05),
     0 1px 0 rgba(255,255,255,0.6) inset;
   padding: 14px 18px;
+  box-sizing: border-box;
 }
 
 /* Card-style chat bubble - assistant */
 .msg-ai {
   background: linear-gradient(180deg, #ffffff 0%, #f7f9fc 100%);
   border: 1px solid #cddae8;
-  border-radius: 4px 16px 16px 16px;
+  border-radius: 12px;
   box-shadow:
     0 3px 8px rgba(0,0,0,0.06),
     0 1px 0 rgba(255,255,255,0.8) inset;
   padding: 14px 18px;
+  box-sizing: border-box;
 }
 
 /* Floating ink-style input area */

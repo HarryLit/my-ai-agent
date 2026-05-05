@@ -56,6 +56,11 @@ export default function Sidebar({
             background: 'rgba(255,255,255,0.08)',
             border: '1px solid rgba(255,255,255,0.12)',
             color: '#c8bda0',
+            height: 36,
+            width: 36,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
           }}
         />
       </div>

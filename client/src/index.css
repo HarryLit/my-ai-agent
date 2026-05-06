@@ -180,11 +180,3 @@ body {
   vertical-align: middle;
   margin-left: 2px;
 }
-
-/* Shiki code blocks */
-.shiki {
-  padding: 12px 16px !important;
-  margin: 0 !important;
-  border-radius: 6px;
-  overflow-x: auto;
-}

@@ -1,8 +1,9 @@
 import { ArrowDownOutlined, ArrowUpOutlined, ClockCircleOutlined, ThunderboltOutlined, CodeOutlined, CopyOutlined, FileTextOutlined } from '@ant-design/icons'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
-import { useEffect, useState, useCallback } from 'react'
-import { codeToHtml } from 'shiki'
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
+import { oneLight } from 'react-syntax-highlighter/dist/esm/styles/prism'
+import { useState, useCallback } from 'react'
 import type { Message } from '../types'
 
 interface MessageItemProps {
@@ -11,41 +12,6 @@ interface MessageItemProps {
   streamStats?: { inputTokens: number; outputTokens: number; waitTimeMs: number; outputSpeedTps: number } | null
   isStreaming?: boolean
   modelName?: string
-}
-
-function CodeBlock({ lang, code }: { lang: string; code: string }) {
-  const [html, setHtml] = useState('')
-
-  useEffect(() => {
-    let cancelled = false
-    codeToHtml(code, {
-      lang: lang || 'text',
-      theme: 'github-light-default'
-    }).then(h => {
-      if (!cancelled) setHtml(h)
-    }).catch(() => {})
-    return () => { cancelled = true }
-  }, [code, lang])
-
-  return (
-    <div style={{ margin: '8px 0', borderRadius: 6, overflow: 'hidden', border: '1px solid #cddae8' }}>
-      {lang && (
-        <div style={{
-          padding: '4px 12px', fontSize: 11, color: '#7a8fa8',
-          background: '#eef3f8', borderBottom: '1px solid #cddae8', fontFamily: 'monospace'
-        }}>
-          {lang}
-        </div>
-      )}
-      {html ? (
-        <div style={{ padding: 0, background: 'transparent', fontSize: 13 }} dangerouslySetInnerHTML={{ __html: html }} />
-      ) : (
-        <div style={{ padding: '12px 16px', background: '#eef3f8', fontSize: 13 }}>
-          <code style={{ fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace', color: '#2c3e4a' }}>{code}</code>
-        </div>
-      )}
-    </div>
-  )
 }
 
 const markdownComponents: any = {
@@ -70,7 +36,25 @@ const markdownComponents: any = {
     // Block code: ```lang\ncode\n```
     const match = /language-(\w+)/.exec(className || '')
     const codeStr = String(children).replace(/\n+$/, '')
-    return <CodeBlock lang={match?.[1] || ''} code={codeStr} />
+    const lang = match?.[1]
+
+    return (
+      <div style={{ margin: '8px 0', borderRadius: 6, overflow: 'hidden', border: '1px solid #cddae8' }}>
+        {lang && (
+          <div style={{ padding: '4px 12px', fontSize: 11, color: '#7a8fa8', background: '#eef3f8', borderBottom: '1px solid #cddae8', fontFamily: 'monospace' }}>
+            {lang}
+          </div>
+        )}
+        <SyntaxHighlighter
+          style={oneLight}
+          language={lang || 'text'}
+          PreTag="div"
+          customStyle={{ margin: 0, borderRadius: lang ? '0 0 6px 6px' : 6, fontSize: 13, padding: '12px 16px' }}
+        >
+          {codeStr}
+        </SyntaxHighlighter>
+      </div>
+    )
   },
   a({ children, href }: any) {
     return (

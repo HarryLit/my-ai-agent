@@ -13,7 +13,6 @@ export default function App() {
   const chat = useChat()
   const [modelDialogOpen, setModelDialogOpen] = useState(false)
 
-  // Resolve the model name for the active conversation
   const activeModelName = useMemo(() => {
     if (!conversations.activeConvId) return ''
     const conv = conversations.conversations.find(c => c.id === conversations.activeConvId)
@@ -83,9 +82,13 @@ export default function App() {
           hasActiveConv={!!conversations.activeConvId}
           hasActiveModel={!!models.activeModelId}
           modelName={activeModelName}
+          models={models.models}
+          activeModelId={models.activeModelId}
           onSend={handleSend}
           onStop={chat.stop}
           onClear={() => conversations.activeConvId && chat.clear(conversations.activeConvId)}
+          onModelChange={models.setActiveModelId}
+          onOpenModelConfig={() => setModelDialogOpen(true)}
         />
         <ModelDialog
           open={modelDialogOpen}

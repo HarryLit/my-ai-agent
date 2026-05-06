@@ -4,7 +4,7 @@ import { ConversationsService } from '../conversations/conversations.service'
 import { ModelsService, ModelConfig } from '../models/models.service'
 
 export interface StreamEvent {
-  type: 'token' | 'done' | 'error'
+  type: 'token' | 'thinking' | 'done' | 'error'
   content?: string
   tokens?: number
   inputTokens?: number
@@ -53,6 +53,9 @@ export class ChatService {
         messages,
         stream: true
       }
+      if (model.thinking_enabled as any === 1 || (model.thinking_enabled as any) === '1') {
+        body.reasoning_effort = 'medium'
+      }
       if (model.temperature !== null && model.temperature !== undefined) body.temperature = Number(model.temperature)
       if (model.top_p !== null && model.top_p !== undefined) body.top_p = Number(model.top_p)
       if (model.max_tokens !== null && model.max_tokens !== undefined) body.max_tokens = Number(model.max_tokens)
@@ -97,68 +100,89 @@ export class ChatService {
         const decoder = new TextDecoder()
         let buffer = ''
 
+        const finish = () => {
+          const waitTime = firstTokenTime ? firstTokenTime - startTime : 0
+          const elapsed = firstTokenTime ? (Date.now() - firstTokenTime) / 1000 : 1
+          const speed = outputTokens / Math.max(elapsed, 0.01)
+
+          this.convService.addMessage({
+            conversation_id: conversationId,
+            role: 'assistant',
+            content: accumulatedContent,
+            input_tokens: inputTokens,
+            output_tokens: outputTokens,
+            wait_time_ms: waitTime,
+            output_speed_tps: parseFloat(speed.toFixed(2))
+          })
+
+          if (accumulatedContent.length > 0 && history.length <= 1) {
+            const title = content.slice(0, 30) + (content.length > 30 ? '...' : '')
+            this.convService.updateTitle(conversationId, title)
+          }
+
+          observer.next({
+            type: 'done',
+            inputTokens,
+            outputTokens,
+            waitTimeMs: waitTime,
+            outputSpeedTps: parseFloat(speed.toFixed(2))
+          })
+          observer.complete()
+        }
+
         const processChunk = () => {
           while (buffer.includes('\n')) {
             const idx = buffer.indexOf('\n')
             const line = buffer.slice(0, idx).trim()
             buffer = buffer.slice(idx + 1)
 
-            if (!line || line.startsWith(':')) continue
+            if (!line) continue
+            if (line.startsWith(':')) continue
             if (!line.startsWith('data: ')) continue
 
-            const data = line.slice(6)
+            const data = line.slice(6).trim()
             if (data === '[DONE]') {
-              const waitTime = firstTokenTime ? firstTokenTime - startTime : 0
-              const elapsed = firstTokenTime ? (Date.now() - firstTokenTime) / 1000 : 1
-              const speed = outputTokens / Math.max(elapsed, 0.01)
-
-              this.convService.addMessage({
-                conversation_id: conversationId,
-                role: 'assistant',
-                content: accumulatedContent,
-                input_tokens: inputTokens,
-                output_tokens: outputTokens,
-                wait_time_ms: waitTime,
-                output_speed_tps: parseFloat(speed.toFixed(2))
-              })
-
-              if (accumulatedContent.length > 0 && history.length <= 1) {
-                const title = content.slice(0, 30) + (content.length > 30 ? '...' : '')
-                this.convService.updateTitle(conversationId, title)
-              }
-
-              observer.next({
-                type: 'done',
-                inputTokens,
-                outputTokens,
-                waitTimeMs: waitTime,
-                outputSpeedTps: parseFloat(speed.toFixed(2))
-              })
-              observer.complete()
-              return
+              finish()
+              return true // signal completion
             }
 
             try {
               const parsed = JSON.parse(data)
-              const delta = parsed.choices?.[0]?.delta
+              const choice = parsed.choices?.[0]
+              const delta = choice?.delta
+              const finishReason = choice?.finish_reason
+
               if (delta?.content) {
                 if (!firstTokenTime) firstTokenTime = Date.now()
                 accumulatedContent += delta.content
                 outputTokens = Math.ceil(accumulatedContent.length / 4)
                 observer.next({ type: 'token', content: delta.content, tokens: outputTokens })
               }
+
+              if (finishReason && finishReason !== 'null') {
+                // Some providers send token usage in the final chunk
+                if (parsed.usage) {
+                  inputTokens = parsed.usage.prompt_tokens || inputTokens
+                  outputTokens = parsed.usage.completion_tokens || outputTokens
+                }
+                finish()
+                return true
+              }
             } catch {}
           }
+          return false
         }
 
         const pump = () => {
           reader.read().then(({ done, value }) => {
             if (done) {
-              processChunk()
+              const completed = processChunk()
+              if (!completed) finish()
               return
             }
             buffer += decoder.decode(value, { stream: true })
-            processChunk()
+            const completed = processChunk()
+            if (completed) return
             pump()
           }).catch((err: Error) => {
             observer.next({ type: 'error', message: err.message })

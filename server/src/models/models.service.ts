@@ -16,6 +16,7 @@ export interface ModelConfig {
   frequency_penalty: number | null
   presence_penalty: number | null
   request_template: string
+  thinking_enabled: number
   is_active: number
   created_at: string
 }
@@ -33,6 +34,7 @@ export interface CreateModelDto {
   frequency_penalty?: number
   presence_penalty?: number
   request_template?: string
+  thinking_enabled?: number
 }
 
 type SqlRow = Record<string, any>
@@ -70,9 +72,9 @@ export class ModelsService {
     const headers = dto.headers ? JSON.stringify(dto.headers) : '{}'
     const stop = dto.stop ? JSON.stringify(dto.stop) : '[]'
     this.db.getDb().run(
-      `INSERT INTO models (id, name, api_url, api_key, model_name, headers, temperature, top_p, max_tokens, stop, frequency_penalty, presence_penalty, request_template)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [id, dto.name, dto.api_url, dto.api_key || '', dto.model_name || '', headers, dto.temperature ?? null, dto.top_p ?? null, dto.max_tokens ?? null, stop, dto.frequency_penalty ?? null, dto.presence_penalty ?? null, dto.request_template || '']
+      `INSERT INTO models (id, name, api_url, api_key, model_name, headers, temperature, top_p, max_tokens, stop, frequency_penalty, presence_penalty, request_template, thinking_enabled)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [id, dto.name, dto.api_url, dto.api_key || '', dto.model_name || '', headers, dto.temperature ?? null, dto.top_p ?? null, dto.max_tokens ?? null, stop, dto.frequency_penalty ?? null, dto.presence_penalty ?? null, dto.request_template || '', dto.thinking_enabled ?? 0]
     )
     this.db.save()
     return this.findOne(id)

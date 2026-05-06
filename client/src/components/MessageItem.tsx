@@ -172,7 +172,13 @@ export default function MessageItem({ message, streamingContent, streamStats, is
       </div>
 
       <div className={isUser ? 'msg-user' : 'msg-ai'} style={{ width: '100%' }}>
-        {isUser ? (
+        {isStreaming && !content ? (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#7a8fa8', fontSize: 13 }}>
+            <span className="typing-cursor" />
+            <span className="typing-cursor" style={{ animationDelay: '0.2s' }} />
+            <span className="typing-cursor" style={{ animationDelay: '0.4s' }} />
+          </div>
+        ) : isUser ? (
           <div style={{ fontSize: 14, lineHeight: 1.7, wordBreak: 'break-word', whiteSpace: 'pre-wrap' }}>
             {content}
           </div>
@@ -191,12 +197,12 @@ export default function MessageItem({ message, streamingContent, streamStats, is
 
       {showStats && (
         <div style={{ marginTop: 6, display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-          {input > 0 && (
-            <span className="stat-tag"><ArrowDownOutlined /> {input}</span>
-          )}
-          {output > 0 && (
-            <span className="stat-tag"><ArrowUpOutlined /> {output}</span>
-          )}
+            {input > 0 && (
+              <span className="stat-tag"><ArrowDownOutlined /> 输入 {input}</span>
+            )}
+            {output > 0 && (
+              <span className="stat-tag"><ArrowUpOutlined /> 输出 {output}</span>
+            )}
           {wait > 0 && (
             <span className="stat-tag"><ClockCircleOutlined /> {wait}ms</span>
           )}

@@ -24,7 +24,19 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
 
     this.db.run('PRAGMA journal_mode = WAL')
     this.initSchema()
+    this.migrate()
     this.save()
+  }
+
+  private migrate() {
+    // Add missing columns
+    const cols = this.db.prepare("PRAGMA table_info('models')")
+    const existing: string[] = []
+    while (cols.step()) existing.push(cols.getAsObject().name)
+    cols.free()
+    if (!existing.includes('thinking_enabled')) {
+      this.db.run('ALTER TABLE models ADD COLUMN thinking_enabled INTEGER NOT NULL DEFAULT 0')
+    }
   }
 
   private initSchema() {
@@ -43,6 +55,7 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
         frequency_penalty REAL,
         presence_penalty REAL,
         request_template TEXT DEFAULT '',
+        thinking_enabled INTEGER NOT NULL DEFAULT 0,
         is_active INTEGER NOT NULL DEFAULT 1,
         created_at TEXT NOT NULL DEFAULT (datetime('now'))
       )

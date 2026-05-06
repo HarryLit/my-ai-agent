@@ -24,7 +24,7 @@ const markdownComponents: any = {
       return (
         <code style={{
           padding: '1px 5px', background: 'rgba(74,144,217,0.08)',
-          borderRadius: 3, fontSize: '0.9em',
+          borderRadius: 3,           fontSize: '0.85em',
           fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace',
           color: '#4a90d9'
         }}>

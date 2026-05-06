@@ -1,7 +1,7 @@
-import { ArrowDownOutlined, ArrowUpOutlined, ClockCircleOutlined, ThunderboltOutlined } from '@ant-design/icons'
+import { ArrowDownOutlined, ArrowUpOutlined, ClockCircleOutlined, ThunderboltOutlined, CodeOutlined, CopyOutlined, FileTextOutlined } from '@ant-design/icons'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { codeToHtml } from 'shiki'
 import type { Message } from '../types'
 
@@ -37,16 +37,13 @@ function CodeBlock({ lang, code }: { lang: string; code: string }) {
           {lang}
         </div>
       )}
-      <div
-        style={{
-          padding: html ? 0 : '12px 16px',
-          background: html ? 'transparent' : '#eef3f8',
-          fontSize: 13
-        }}
-        dangerouslySetInnerHTML={html ? { __html: html } : undefined}
-      >
-        {!html && <code style={{ fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace', color: '#2c3e4a' }}>{code}</code>}
-      </div>
+      {html ? (
+        <div style={{ padding: 0, background: 'transparent', fontSize: 13 }} dangerouslySetInnerHTML={{ __html: html }} />
+      ) : (
+        <div style={{ padding: '12px 16px', background: '#eef3f8', fontSize: 13 }}>
+          <code style={{ fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace', color: '#2c3e4a' }}>{code}</code>
+        </div>
+      )}
     </div>
   )
 }
@@ -155,6 +152,7 @@ export default function MessageItem({ message, streamingContent, streamStats, is
   const isUser = message?.role === 'user'
   const content = message?.content || streamingContent || ''
   const showStats = !isUser && !isStreaming && (message || streamStats)
+  const [showRaw, setShowRaw] = useState(false)
 
   const input = message ? message.input_tokens : streamStats?.inputTokens ?? 0
   const output = message ? message.output_tokens : streamStats?.outputTokens ?? 0
@@ -162,6 +160,10 @@ export default function MessageItem({ message, streamingContent, streamStats, is
   const speed = message ? message.output_speed_tps : streamStats?.outputSpeedTps ?? 0
 
   const roleLabel = isUser ? '你' : (modelName || 'AI')
+
+  const handleCopy = useCallback(() => {
+    navigator.clipboard.writeText(content).catch(() => {})
+  }, [content])
 
   return (
     <div style={{ marginBottom: 16, width: '100%' }}>
@@ -186,12 +188,38 @@ export default function MessageItem({ message, streamingContent, streamStats, is
             {content}
           </div>
         ) : (
-          <ReactMarkdown
-            remarkPlugins={[remarkGfm]}
-            components={markdownComponents}
-          >
-            {content || ' '}
-          </ReactMarkdown>
+          showRaw ? (
+            <pre style={{ fontSize: 13, lineHeight: 1.7, whiteSpace: 'pre-wrap', wordBreak: 'break-word', margin: 0, color: '#2c3e4a', fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace' }}>
+              {content}
+            </pre>
+          ) : (
+            <ReactMarkdown
+              remarkPlugins={[remarkGfm]}
+              components={markdownComponents}
+            >
+              {content || ' '}
+            </ReactMarkdown>
+          )
+        )}
+        {!isUser && !isStreaming && content && (
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 4, marginTop: 8 }}>
+            <span
+              onClick={() => setShowRaw(!showRaw)}
+              style={{ cursor: 'pointer', padding: '2px 6px', borderRadius: 4, fontSize: 12, color: '#7a8fa8', display: 'inline-flex', alignItems: 'center', gap: 3, transition: 'color 0.2s' }}
+              onMouseEnter={e => (e.currentTarget.style.color = '#4a90d9')}
+              onMouseLeave={e => (e.currentTarget.style.color = '#7a8fa8')}
+            >
+              {showRaw ? <><FileTextOutlined /> 渲染</> : <><CodeOutlined /> 原文</>}
+            </span>
+            <span
+              onClick={handleCopy}
+              style={{ cursor: 'pointer', padding: '2px 6px', borderRadius: 4, fontSize: 12, color: '#7a8fa8', display: 'inline-flex', alignItems: 'center', gap: 3, transition: 'color 0.2s' }}
+              onMouseEnter={e => (e.currentTarget.style.color = '#4a90d9')}
+              onMouseLeave={e => (e.currentTarget.style.color = '#7a8fa8')}
+            >
+              <CopyOutlined /> 复制
+            </span>
+          </div>
         )}
         {isStreaming && content && (
           <span className="typing-cursor" />

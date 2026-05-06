@@ -50,8 +50,11 @@ function CodeBlock({ lang, code }: { lang: string; code: string }) {
 
 const markdownComponents: any = {
   code({ className, children, ...props }: any) {
+    const isBlock = className?.startsWith('language-') || (props.inline === false)
+    const isInline = props.inline === true || (!isBlock && className === undefined)
+
     // Inline code: `code`
-    if (props.inline) {
+    if (isInline) {
       return (
         <code style={{
           padding: '1px 5px', background: 'rgba(74,144,217,0.08)',

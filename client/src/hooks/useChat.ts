@@ -1,5 +1,4 @@
 import { useState, useRef, useCallback } from 'react'
-import { flushSync } from 'react-dom'
 import { v4 as uuid } from 'uuid'
 import type { Message, StreamEvent } from '../types'
 import * as api from '../api'
@@ -47,9 +46,7 @@ export function useChat() {
       (event: StreamEvent) => {
         if (event.type === 'token') {
           partialContentRef.current += (event.content || '')
-          flushSync(() => {
-            setStreamingContent(partialContentRef.current)
-          })
+          setStreamingContent(partialContentRef.current)
         } else if (event.type === 'done') {
           setIsStreaming(false)
           setStreamStats({

@@ -2,6 +2,20 @@ import * as fs from 'fs'
 import * as path from 'path'
 import { randomBytes } from 'crypto'
 
+export interface RequestInfo {
+  url: string
+  headers: Record<string, string>
+  body: string
+}
+
+export interface ResponseInfo {
+  content: string
+  inputTokens: number
+  outputTokens: number
+  waitTimeMs: number
+  outputSpeedTps: number
+}
+
 export class ChatLogger {
   private logDir: string
   private files = new Map<string, string>()
@@ -13,7 +27,7 @@ export class ChatLogger {
     }
   }
 
-  getOrCreateFile(conversationId: string): string {
+  private getFile(conversationId: string): string {
     if (this.files.has(conversationId)) {
       return this.files.get(conversationId)!
     }
@@ -25,10 +39,46 @@ export class ChatLogger {
     return filepath
   }
 
-  write(conversationId: string, role: 'user' | 'assistant' | 'system', content: string) {
-    const filepath = this.getOrCreateFile(conversationId)
-    const timestamp = new Date().toISOString()
-    const line = `[${timestamp}] [${role}]\n${content}\n\n`
-    fs.appendFileSync(filepath, line, 'utf-8')
+  logRound(conversationId: string, req: RequestInfo, res: ResponseInfo) {
+    const filepath = this.getFile(conversationId)
+    const ts = new Date().toISOString()
+    const sep = '='.repeat(72)
+    const sections: string[] = [
+      sep,
+      `[${ts}] REQUEST`,
+      sep,
+      `URL: ${req.url}`,
+      '',
+      'HEADERS:',
+      ...Object.entries(req.headers).map(([k, v]) => {
+        if (k.toLowerCase() === 'authorization') v = v.slice(0, 8) + '...' // mask api key
+        return `  ${k}: ${v}`
+      }),
+      '',
+      'BODY:',
+      this.prettyPrint(req.body),
+      '',
+      sep,
+      `[${ts}] RESPONSE`,
+      sep,
+      'CONTENT:',
+      res.content,
+      '',
+      `INPUT_TOKENS: ${res.inputTokens}`,
+      `OUTPUT_TOKENS: ${res.outputTokens}`,
+      `WAIT_TIME_MS: ${res.waitTimeMs}`,
+      `OUTPUT_SPEED_TPS: ${res.outputSpeedTps}`,
+      '',
+      '',
+    ]
+    fs.appendFileSync(filepath, sections.join('\n'), 'utf-8')
+  }
+
+  private prettyPrint(jsonStr: string): string {
+    try {
+      return JSON.stringify(JSON.parse(jsonStr), null, 2)
+    } catch {
+      return jsonStr
+    }
   }
 }

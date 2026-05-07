@@ -47,8 +47,6 @@ export class ChatService {
 
       this.convService.addMessage({ conversation_id: conversationId, role: 'user', content })
 
-      this.logger.write(conversationId, 'user', content)
-
       const history = this.convService.getMessages(conversationId)
       const messages = history.map(m => ({ role: m.role, content: m.content }))
 
@@ -78,14 +76,19 @@ export class ChatService {
 
       const apiUrl = model.api_url.replace(/\/+$/, '')
 
-      fetch(apiUrl + '/chat/completions', {
+      // Save request info for logging
+      const requestHeaders: Record<string, string> = {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${model.api_key}`,
+        ...customHeaders
+      }
+      const requestBody = JSON.stringify(body)
+      const requestUrl = apiUrl + '/chat/completions'
+
+      fetch(requestUrl, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${model.api_key}`,
-          ...customHeaders
-        },
-        body: JSON.stringify(body)
+        headers: requestHeaders,
+        body: requestBody
       }).then(async (res: Response) => {
         if (!res.ok) {
           const errText = await res.text()
@@ -109,7 +112,17 @@ export class ChatService {
           const elapsed = firstTokenTime ? (Date.now() - firstTokenTime) / 1000 : 1
           const speed = outputTokens / Math.max(elapsed, 0.01)
 
-          this.logger.write(conversationId, 'assistant', accumulatedContent)
+          this.logger.logRound(conversationId, {
+            url: requestUrl,
+            headers: requestHeaders,
+            body: requestBody
+          }, {
+            content: accumulatedContent,
+            inputTokens,
+            outputTokens,
+            waitTimeMs: waitTime,
+            outputSpeedTps: parseFloat(speed.toFixed(2))
+          })
 
           this.convService.addMessage({
             conversation_id: conversationId,

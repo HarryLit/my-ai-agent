@@ -28,8 +28,8 @@ export default function App() {
   }, [conversations.activeConvId])
 
   const handleSend = (content: string) => {
-    if (!conversations.activeConvId) return
-    chat.send(conversations.activeConvId, content)
+    if (!conversations.activeConvId || !models.activeModelId) return
+    chat.send(conversations.activeConvId, content, models.activeModelId)
   }
 
   const handleNewConv = () => {

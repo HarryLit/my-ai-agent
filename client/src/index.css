@@ -180,3 +180,15 @@ body {
   vertical-align: middle;
   margin-left: 2px;
 }
+
+/* Button animations */
+.action-btn {
+  transition: color 0.2s, background 0.2s, transform 0.15s;
+}
+.action-btn:hover {
+  color: #4a90d9 !important;
+  background: rgba(74,144,217,0.06) !important;
+}
+.action-btn:active {
+  transform: scale(0.92);
+}

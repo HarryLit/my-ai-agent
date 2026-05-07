@@ -23,7 +23,7 @@ export class ChatService {
     private logger: ChatLogger
   ) {}
 
-  sendMessage(conversationId: string, content: string): Observable<StreamEvent> {
+  sendMessage(conversationId: string, content: string, overrideModelId?: string): Observable<StreamEvent> {
     return new Observable((observer: Observer<StreamEvent>) => {
       let conv: any
       try { conv = this.convService.findOne(conversationId) } catch {
@@ -33,7 +33,7 @@ export class ChatService {
       }
 
       let model: ModelConfig
-      try { model = this.modelsService.findOne(conv.model_id) } catch {
+      try { model = this.modelsService.findOne(overrideModelId || conv.model_id) } catch {
         observer.next({ type: 'error', message: 'Model not found' })
         observer.complete()
         return
@@ -44,6 +44,7 @@ export class ChatService {
       let accumulatedContent = ''
       let outputTokens = 0
       let inputTokens = 0
+      let reasoningContent = ''
       const rawChunks: string[] = []
 
       this.convService.addMessage({ conversation_id: conversationId, role: 'user', content })
@@ -130,6 +131,7 @@ export class ChatService {
             conversation_id: conversationId,
             role: 'assistant',
             content: accumulatedContent,
+            reasoning_content: reasoningContent,
             input_tokens: inputTokens,
             output_tokens: outputTokens,
             wait_time_ms: waitTime,
@@ -182,6 +184,7 @@ export class ChatService {
               }
 
               if (delta?.reasoning_content) {
+                reasoningContent += delta.reasoning_content
                 observer.next({ type: 'thinking', content: delta.reasoning_content })
               }
 

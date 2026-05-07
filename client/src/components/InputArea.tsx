@@ -92,7 +92,7 @@ export default function InputArea({ onSend, onStop, isStreaming, disabled, model
               style={{ minWidth: 160 }}
               popupMatchSelectWidth={false}
             />
-            <Button icon={<SettingOutlined />} onClick={onOpenModelConfig} size="small" />
+            <Button icon={<SettingOutlined />} onClick={onOpenModelConfig} size="small" className="action-btn" />
           </div>
         </div>
       </div>

@@ -169,8 +169,8 @@ export default function MessageItem({ message, streamingContent, thinkingContent
 
       <div className={isUser ? 'msg-user' : 'msg-ai'} style={{ width: '100%' }}>
         {/* Thinking / reasoning content */}
-        {!isUser && (thinkingContent || (isStreaming && !content)) && (
-          <div style={{ marginBottom: thinkingContent ? 10 : 0 }}>
+        {!isUser && (thinkingContent || message?.reasoning_content || (isStreaming && !content)) && (
+          <div style={{ marginBottom: (thinkingContent || message?.reasoning_content) ? 10 : 0 }}>
             <div
               onClick={() => setThinkingCollapsed(!thinkingCollapsed)}
               style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: '#7a8fa8', userSelect: 'none', paddingBottom: 4 }}
@@ -183,21 +183,16 @@ export default function MessageItem({ message, streamingContent, thinkingContent
                   {(thinkingTime / 1000).toFixed(1)}s
                 </span>
               )}
-              {thinkingDone && <span style={{ color: '#7a8fa8' }}>✓</span>}
+              {(!!message?.reasoning_content || thinkingDone) && <span style={{ color: '#7a8fa8' }}>✓</span>}
             </div>
-            {!thinkingCollapsed && thinkingContent && (
+            {!thinkingCollapsed && (thinkingContent || message?.reasoning_content) && (
               <div style={{
                 fontSize: 12, lineHeight: 1.6, color: '#7a8fa8', whiteSpace: 'pre-wrap',
                 padding: '8px 10px', background: 'rgba(74,144,217,0.04)', borderRadius: 6,
                 borderLeft: '2px solid #d4a84b', fontStyle: 'italic', marginTop: 4
               }}>
-                {thinkingContent}
+                {message?.reasoning_content || thinkingContent}
                 {isStreaming && !thinkingDone && <span className="typing-cursor" />}
-                {!thinkingContent && isStreaming && (
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#7a8fa8', fontSize: 13 }}>
-                    <span className="typing-cursor" />
-                  </div>
-                )}
               </div>
             )}
           </div>
@@ -215,59 +210,62 @@ export default function MessageItem({ message, streamingContent, thinkingContent
           </div>
         ) : (
           showRaw ? (
-            <pre style={{ fontSize: 13, lineHeight: 1.7, whiteSpace: 'pre-wrap', wordBreak: 'break-word', margin: 0, color: '#2c3e4a', fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace' }}>
-              {content}
-            </pre>
+            <div>
+              <pre style={{ fontSize: 13, lineHeight: 1.7, whiteSpace: 'pre-wrap', wordBreak: 'break-word', margin: 0, color: '#2c3e4a', fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace' }}>
+                {content}
+              </pre>
+              {isStreaming && <span className="typing-cursor" />}
+            </div>
           ) : (
-            <ReactMarkdown
-              remarkPlugins={[remarkGfm]}
-              components={markdownComponents}
-            >
-              {content || ' '}
-            </ReactMarkdown>
+            <div>
+              <ReactMarkdown
+                remarkPlugins={[remarkGfm]}
+                components={markdownComponents}
+              >
+                {content || ' '}
+              </ReactMarkdown>
+              {isStreaming && content && <span className="typing-cursor" />}
+            </div>
           )
         )}
         {!isUser && !isStreaming && content && (
-          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 4, marginTop: 8 }}>
-            <span
-              onClick={() => setShowRaw(!showRaw)}
-              style={{ cursor: 'pointer', padding: '2px 6px', borderRadius: 4, fontSize: 12, color: '#7a8fa8', display: 'inline-flex', alignItems: 'center', gap: 3, transition: 'color 0.2s' }}
-              onMouseEnter={e => (e.currentTarget.style.color = '#4a90d9')}
-              onMouseLeave={e => (e.currentTarget.style.color = '#7a8fa8')}
-            >
-              {showRaw ? <><FileTextOutlined /> 渲染</> : <><CodeOutlined /> 原文</>}
-            </span>
-            <span
-              onClick={handleCopy}
-              style={{ cursor: 'pointer', padding: '2px 6px', borderRadius: 4, fontSize: 12, color: '#7a8fa8', display: 'inline-flex', alignItems: 'center', gap: 3, transition: 'color 0.2s' }}
-              onMouseEnter={e => (e.currentTarget.style.color = '#4a90d9')}
-              onMouseLeave={e => (e.currentTarget.style.color = '#7a8fa8')}
-            >
-              <CopyOutlined /> 复制
-            </span>
+          <div style={{ marginTop: 6, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '4px 8px' }}>
+            {showStats && (
+              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                {input > 0 && (
+                  <span className="stat-tag"><ArrowUpOutlined /> 输入 {input}</span>
+                )}
+                {output > 0 && (
+                  <span className="stat-tag"><ArrowDownOutlined /> 输出 {output}</span>
+                )}
+                {wait > 0 && (
+                  <span className="stat-tag"><ClockCircleOutlined /> {wait}ms</span>
+                )}
+                {speed > 0 && (
+                  <span className="stat-tag"><ThunderboltOutlined /> {speed.toFixed(1)}t/s</span>
+                )}
+              </div>
+            )}
+            {showStats && <div />}
+            <div style={{ display: 'flex', gap: 6 }}>
+              <span
+                onClick={() => setShowRaw(!showRaw)}
+                className="action-btn"
+                style={{ cursor: 'pointer', padding: '2px 6px', borderRadius: 4, fontSize: 12, color: '#7a8fa8', display: 'inline-flex', alignItems: 'center', gap: 3 }}
+              >
+                {showRaw ? <><FileTextOutlined /> 渲染</> : <><CodeOutlined /> 原文</>}
+              </span>
+              <span
+                onClick={handleCopy}
+                className="action-btn"
+                style={{ cursor: 'pointer', padding: '2px 6px', borderRadius: 4, fontSize: 12, color: '#7a8fa8', display: 'inline-flex', alignItems: 'center', gap: 3 }}
+              >
+                <CopyOutlined /> 复制
+              </span>
+            </div>
           </div>
         )}
-        {isStreaming && content && (
-          <span className="typing-cursor" />
-        )}
       </div>
-
-      {showStats && (
-        <div style={{ marginTop: 6, display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-            {input > 0 && (
-              <span className="stat-tag"><ArrowUpOutlined /> 输入 {input}</span>
-            )}
-            {output > 0 && (
-              <span className="stat-tag"><ArrowDownOutlined /> 输出 {output}</span>
-            )}
-          {wait > 0 && (
-            <span className="stat-tag"><ClockCircleOutlined /> {wait}ms</span>
-          )}
-          {speed > 0 && (
-            <span className="stat-tag"><ThunderboltOutlined /> {speed.toFixed(1)}t/s</span>
-          )}
-        </div>
-      )}
     </div>
   )
 }

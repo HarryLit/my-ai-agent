@@ -29,6 +29,7 @@ export interface Message {
   conversation_id: string
   role: 'user' | 'assistant'
   content: string
+  reasoning_content: string
   input_tokens: number
   output_tokens: number
   wait_time_ms: number

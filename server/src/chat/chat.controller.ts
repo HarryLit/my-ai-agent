@@ -10,6 +10,7 @@ export class ChatController {
   async send(
     @Query('conversationId') conversationId: string,
     @Body('content') content: string,
+    @Body('modelId') modelId: string | undefined,
     @Req() req: Request,
     @Res() res: Response
   ) {
@@ -18,7 +19,7 @@ export class ChatController {
     res.setHeader('Connection', 'keep-alive')
     res.setHeader('X-Accel-Buffering', 'no')
 
-    const subscription = this.chatService.sendMessage(conversationId, content).subscribe({
+    const subscription = this.chatService.sendMessage(conversationId, content, modelId).subscribe({
       next: (event) => {
         res.write(`data: ${JSON.stringify(event)}\n\n`)
       },

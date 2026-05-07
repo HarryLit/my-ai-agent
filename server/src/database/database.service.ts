@@ -37,6 +37,13 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
     if (!existing.includes('thinking_enabled')) {
       this.db.run('ALTER TABLE models ADD COLUMN thinking_enabled INTEGER NOT NULL DEFAULT 0')
     }
+    const msgCols = this.db.prepare("PRAGMA table_info('messages')")
+    const msgExisting: string[] = []
+    while (msgCols.step()) msgExisting.push(msgCols.getAsObject().name)
+    msgCols.free()
+    if (!msgExisting.includes('reasoning_content')) {
+      this.db.run('ALTER TABLE messages ADD COLUMN reasoning_content TEXT NOT NULL DEFAULT \'\'')
+    }
   }
 
   private initSchema() {
@@ -76,6 +83,7 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
         conversation_id TEXT NOT NULL,
         role TEXT NOT NULL CHECK(role IN ('user', 'assistant')),
         content TEXT NOT NULL DEFAULT '',
+        reasoning_content TEXT NOT NULL DEFAULT '',
         input_tokens INTEGER DEFAULT 0,
         output_tokens INTEGER DEFAULT 0,
         wait_time_ms INTEGER DEFAULT 0,

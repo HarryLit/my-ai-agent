@@ -45,12 +45,13 @@ export function useChat() {
     setStreamStats(null)
   }, [])
 
-  const send = useCallback((conversationId: string, content: string) => {
+  const send = useCallback((conversationId: string, content: string, modelId: string) => {
     const userMsg: Message = {
       id: uuid(),
       conversation_id: conversationId,
       role: 'user',
       content,
+      reasoning_content: '',
       input_tokens: 0,
       output_tokens: 0,
       wait_time_ms: 0,
@@ -68,7 +69,7 @@ export function useChat() {
     partialContentRef.current = ''
     convIdRef.current = conversationId
 
-    abortRef.current = api.sendChatMessage(conversationId, content,
+    abortRef.current = api.sendChatMessage(conversationId, content, modelId,
       (event: StreamEvent) => {
         if (event.type === 'thinking') {
           if (!thinkingStartRef.current) startThinkingTimer()
@@ -113,6 +114,7 @@ export function useChat() {
         conversation_id: convIdRef.current,
         role: 'assistant',
         content: partialContentRef.current,
+        reasoning_content: '',
         input_tokens: 0,
         output_tokens: Math.ceil(partialContentRef.current.length / 4),
         wait_time_ms: 0,

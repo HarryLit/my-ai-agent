@@ -45,6 +45,7 @@ export default function ChatWindow({
             size="small"
             icon={<ClearOutlined />}
             onClick={onClear}
+            className="action-btn"
             style={{ color: '#7a8fa8', fontSize: 12 }}
           >
             清空对话

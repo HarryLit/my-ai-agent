@@ -59,6 +59,7 @@ export async function clearMessages(conversationId: string): Promise<void> {
 export function sendChatMessage(
   conversationId: string,
   content: string,
+  modelId: string,
   onEvent: (event: StreamEvent) => void,
   onError: (err: Error) => void
 ): AbortController {
@@ -67,7 +68,7 @@ export function sendChatMessage(
   fetch(`${BASE}/chat/send?conversationId=${conversationId}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ content }),
+    body: JSON.stringify({ content, modelId }),
     signal: controller.signal
   }).then(async res => {
     if (!res.ok) {

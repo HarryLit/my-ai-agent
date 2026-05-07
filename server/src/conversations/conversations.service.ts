@@ -85,6 +85,7 @@ export class ConversationsService {
     conversation_id: string
     role: 'user' | 'assistant'
     content: string
+    reasoning_content?: string
     input_tokens?: number
     output_tokens?: number
     wait_time_ms?: number
@@ -92,9 +93,9 @@ export class ConversationsService {
   }): Message {
     const id = uuid()
     this.getDb().run(
-      `INSERT INTO messages (id, conversation_id, role, content, input_tokens, output_tokens, wait_time_ms, output_speed_tps)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-      [id, msg.conversation_id, msg.role, msg.content, msg.input_tokens ?? 0, msg.output_tokens ?? 0, msg.wait_time_ms ?? 0, msg.output_speed_tps ?? 0]
+      `INSERT INTO messages (id, conversation_id, role, content, reasoning_content, input_tokens, output_tokens, wait_time_ms, output_speed_tps)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [id, msg.conversation_id, msg.role, msg.content, msg.reasoning_content ?? '', msg.input_tokens ?? 0, msg.output_tokens ?? 0, msg.wait_time_ms ?? 0, msg.output_speed_tps ?? 0]
     )
     this.getDb().run("UPDATE conversations SET updated_at = datetime('now') WHERE id = ?", [msg.conversation_id])
     this.dbService.save()

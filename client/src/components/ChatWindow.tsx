@@ -7,6 +7,9 @@ import InputArea from './InputArea'
 interface ChatWindowProps {
   messages: any[]
   streamingContent: string
+  thinkingContent: string
+  thinkingTime: number
+  thinkingDone: boolean
   streamStats: any
   isStreaming: boolean
   hasActiveConv: boolean
@@ -22,7 +25,7 @@ interface ChatWindowProps {
 }
 
 export default function ChatWindow({
-  messages, streamingContent, streamStats, isStreaming,
+  messages, streamingContent, thinkingContent, thinkingTime, thinkingDone, streamStats, isStreaming,
   hasActiveConv, hasActiveModel, modelName, models, activeModelId,
   onSend, onStop, onClear, onModelChange, onOpenModelConfig
 }: ChatWindowProps) {
@@ -51,6 +54,9 @@ export default function ChatWindow({
       <MessageList
         messages={messages}
         streamingContent={streamingContent}
+        thinkingContent={thinkingContent}
+        thinkingTime={thinkingTime}
+        thinkingDone={thinkingDone}
         streamStats={streamStats}
         isStreaming={isStreaming}
         modelName={modelName}

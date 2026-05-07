@@ -1,4 +1,4 @@
-import { ArrowDownOutlined, ArrowUpOutlined, ClockCircleOutlined, ThunderboltOutlined, CodeOutlined, CopyOutlined, FileTextOutlined } from '@ant-design/icons'
+import { ArrowDownOutlined, ArrowUpOutlined, ClockCircleOutlined, ThunderboltOutlined, CodeOutlined, CopyOutlined, FileTextOutlined, DownOutlined, RightOutlined, BulbOutlined } from '@ant-design/icons'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
@@ -9,6 +9,9 @@ import type { Message } from '../types'
 interface MessageItemProps {
   message?: Message
   streamingContent?: string
+  thinkingContent?: string
+  thinkingTime?: number
+  thinkingDone?: boolean
   streamStats?: { inputTokens: number; outputTokens: number; waitTimeMs: number; outputSpeedTps: number } | null
   isStreaming?: boolean
   modelName?: string
@@ -135,11 +138,12 @@ const markdownComponents: any = {
   hr: () => <hr style={{ border: 'none', borderTop: '1px solid #cddae8', margin: '16px 0' }} />
 }
 
-export default function MessageItem({ message, streamingContent, streamStats, isStreaming, modelName }: MessageItemProps) {
+export default function MessageItem({ message, streamingContent, thinkingContent, thinkingTime, thinkingDone, streamStats, isStreaming, modelName }: MessageItemProps) {
   const isUser = message?.role === 'user'
   const content = message?.content || streamingContent || ''
   const showStats = !isUser && !isStreaming && (message || streamStats)
   const [showRaw, setShowRaw] = useState(false)
+  const [thinkingCollapsed, setThinkingCollapsed] = useState(false)
 
   const input = message ? message.input_tokens : streamStats?.inputTokens ?? 0
   const output = message ? message.output_tokens : streamStats?.outputTokens ?? 0
@@ -164,7 +168,42 @@ export default function MessageItem({ message, streamingContent, streamStats, is
       </div>
 
       <div className={isUser ? 'msg-user' : 'msg-ai'} style={{ width: '100%' }}>
-        {isStreaming && !content ? (
+        {/* Thinking / reasoning content */}
+        {!isUser && (thinkingContent || (isStreaming && !content)) && (
+          <div style={{ marginBottom: thinkingContent ? 10 : 0 }}>
+            <div
+              onClick={() => setThinkingCollapsed(!thinkingCollapsed)}
+              style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: '#7a8fa8', userSelect: 'none', paddingBottom: 4 }}
+            >
+              {thinkingCollapsed ? <RightOutlined /> : <DownOutlined />}
+              <BulbOutlined style={{ color: '#d4a84b' }} />
+              <span style={{ fontWeight: 600, color: '#b8860b' }}>思考</span>
+              {thinkingTime !== undefined && thinkingTime > 0 && (
+                <span style={{ color: '#7a8fa8' }}>
+                  {(thinkingTime / 1000).toFixed(1)}s
+                </span>
+              )}
+              {thinkingDone && <span style={{ color: '#7a8fa8' }}>✓</span>}
+            </div>
+            {!thinkingCollapsed && thinkingContent && (
+              <div style={{
+                fontSize: 12, lineHeight: 1.6, color: '#7a8fa8', whiteSpace: 'pre-wrap',
+                padding: '8px 10px', background: 'rgba(74,144,217,0.04)', borderRadius: 6,
+                borderLeft: '2px solid #d4a84b', fontStyle: 'italic', marginTop: 4
+              }}>
+                {thinkingContent}
+                {isStreaming && !thinkingDone && <span className="typing-cursor" />}
+                {!thinkingContent && isStreaming && (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#7a8fa8', fontSize: 13 }}>
+                    <span className="typing-cursor" />
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        )}
+
+        {isStreaming && !content && !thinkingContent ? (
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#7a8fa8', fontSize: 13 }}>
             <span className="typing-cursor" />
             <span className="typing-cursor" style={{ animationDelay: '0.2s' }} />

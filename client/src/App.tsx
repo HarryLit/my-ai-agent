@@ -77,6 +77,9 @@ export default function App() {
         <ChatWindow
           messages={chat.messages}
           streamingContent={chat.streamingContent}
+          thinkingContent={chat.thinkingContent}
+          thinkingTime={chat.thinkingTime}
+          thinkingDone={chat.thinkingDone}
           streamStats={chat.streamStats}
           isStreaming={chat.isStreaming}
           hasActiveConv={!!conversations.activeConvId}

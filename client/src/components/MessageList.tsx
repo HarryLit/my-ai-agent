@@ -7,12 +7,15 @@ import MessageItem from './MessageItem'
 interface MessageListProps {
   messages: Message[]
   streamingContent?: string
+  thinkingContent?: string
+  thinkingTime?: number
+  thinkingDone?: boolean
   streamStats?: { inputTokens: number; outputTokens: number; waitTimeMs: number; outputSpeedTps: number } | null
   isStreaming: boolean
   modelName: string
 }
 
-export default function MessageList({ messages, streamingContent, streamStats, isStreaming, modelName }: MessageListProps) {
+export default function MessageList({ messages, streamingContent, thinkingContent, thinkingTime, thinkingDone, streamStats, isStreaming, modelName }: MessageListProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const isNearBottomRef = useRef(true)
   const prevStreamingRef = useRef(false)
@@ -68,6 +71,9 @@ export default function MessageList({ messages, streamingContent, streamStats, i
           {isStreaming && (
             <MessageItem
               streamingContent={streamingContent}
+              thinkingContent={thinkingContent}
+              thinkingTime={thinkingTime}
+              thinkingDone={thinkingDone}
               streamStats={streamStats}
               isStreaming
               modelName={modelName}

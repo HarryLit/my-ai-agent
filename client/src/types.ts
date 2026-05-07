@@ -37,7 +37,7 @@ export interface Message {
 }
 
 export interface StreamEvent {
-  type: 'token' | 'done' | 'error'
+  type: 'token' | 'thinking' | 'done' | 'error'
   content?: string
   tokens?: number
   inputTokens?: number

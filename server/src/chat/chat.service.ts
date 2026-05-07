@@ -181,6 +181,10 @@ export class ChatService {
                 observer.next({ type: 'token', content: delta.content, tokens: outputTokens })
               }
 
+              if (delta?.reasoning_content) {
+                observer.next({ type: 'thinking', content: delta.reasoning_content })
+              }
+
               if (finishReason && finishReason !== 'null') {
                 // Some providers send token usage in the final chunk
                 if (parsed.usage) {

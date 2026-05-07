@@ -52,6 +52,7 @@ export default function MessageList({ messages, streamingContent, thinkingConten
   return (
     <div
       ref={containerRef}
+      data-scroll-container
       className="paper-bg"
       onScroll={handleScroll}
       style={{ flex: 1, overflowY: 'auto', padding: '20px' }}

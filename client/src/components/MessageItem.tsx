@@ -3,7 +3,7 @@ import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
 import { oneLight } from 'react-syntax-highlighter/dist/esm/styles/prism'
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useRef, useLayoutEffect } from 'react'
 import type { Message } from '../types'
 
 interface MessageItemProps {
@@ -144,6 +144,26 @@ export default function MessageItem({ message, streamingContent, thinkingContent
   const showStats = !isUser && !isStreaming && (message || streamStats)
   const [showRaw, setShowRaw] = useState(false)
   const [thinkingCollapsed, setThinkingCollapsed] = useState(false)
+  const itemRef = useRef<HTMLDivElement>(null)
+  const savedDistFromBottom = useRef<number | null>(null)
+
+  const toggleShowRaw = () => {
+    const el = itemRef.current?.closest('[data-scroll-container]')
+    if (el) {
+      savedDistFromBottom.current = el.scrollHeight - el.scrollTop - (el as HTMLElement).clientHeight
+    }
+    setShowRaw(v => !v)
+  }
+
+  useLayoutEffect(() => {
+    if (savedDistFromBottom.current !== null) {
+      const el = itemRef.current?.closest('[data-scroll-container]')
+      if (el) {
+        el.scrollTop = el.scrollHeight - (el as HTMLElement).clientHeight - savedDistFromBottom.current
+      }
+      savedDistFromBottom.current = null
+    }
+  }, [showRaw])
 
   const input = message ? message.input_tokens : streamStats?.inputTokens ?? 0
   const output = message ? message.output_tokens : streamStats?.outputTokens ?? 0
@@ -157,7 +177,7 @@ export default function MessageItem({ message, streamingContent, thinkingContent
   }, [content])
 
   return (
-    <div style={{ marginBottom: 16, width: '100%' }}>
+    <div ref={itemRef} style={{ marginBottom: 16, width: '100%' }}>
       <div style={{
         fontSize: 11,
         color: '#7a8fa8',
@@ -249,8 +269,8 @@ export default function MessageItem({ message, streamingContent, thinkingContent
           )}
           {showStats && <div />}
           <div style={{ display: 'flex', gap: 6 }}>
-            <span
-              onClick={() => setShowRaw(!showRaw)}
+              <span
+                onClick={toggleShowRaw}
               className="action-btn"
               style={{ cursor: 'pointer', padding: '2px 6px', borderRadius: 4, fontSize: 12, color: '#7a8fa8', display: 'inline-flex', alignItems: 'center', gap: 3 }}
             >

@@ -1,5 +1,6 @@
 import { Button } from 'antd'
 import { ClearOutlined } from '@ant-design/icons'
+import type { ModelConfig } from '../types'
 import MessageList from './MessageList'
 import InputArea from './InputArea'
 
@@ -11,24 +12,21 @@ interface ChatWindowProps {
   hasActiveConv: boolean
   hasActiveModel: boolean
   modelName: string
+  models: ModelConfig[]
+  activeModelId: string
   onSend: (content: string) => void
   onStop: () => void
   onClear: () => void
+  onModelChange: (id: string) => void
+  onOpenModelConfig: () => void
 }
 
 export default function ChatWindow({
   messages, streamingContent, streamStats, isStreaming,
-  hasActiveConv, hasActiveModel, modelName, onSend, onStop, onClear
+  hasActiveConv, hasActiveModel, modelName, models, activeModelId,
+  onSend, onStop, onClear, onModelChange, onOpenModelConfig
 }: ChatWindowProps) {
   const showClear = hasActiveConv && messages.length > 0 && !isStreaming
-
-  if (!hasActiveConv) {
-    return (
-      <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }} className="paper-bg">
-        <span style={{ color: '#7a8fa8', fontSize: 14 }}>选择一个对话或创建新对话</span>
-      </div>
-    )
-  }
 
   return (
     <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
@@ -61,7 +59,11 @@ export default function ChatWindow({
         onSend={onSend}
         onStop={onStop}
         isStreaming={isStreaming}
-        disabled={!hasActiveModel}
+        disabled={!hasActiveModel || !hasActiveConv}
+        models={models}
+        activeModelId={activeModelId}
+        onModelChange={onModelChange}
+        onOpenModelConfig={onOpenModelConfig}
       />
     </div>
   )

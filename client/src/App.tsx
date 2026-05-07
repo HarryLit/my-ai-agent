@@ -82,9 +82,13 @@ export default function App() {
           hasActiveConv={!!conversations.activeConvId}
           hasActiveModel={!!models.activeModelId}
           modelName={activeModelName}
+          models={models.models}
+          activeModelId={models.activeModelId}
           onSend={handleSend}
           onStop={chat.stop}
           onClear={() => conversations.activeConvId && chat.clear(conversations.activeConvId)}
+          onModelChange={models.setActiveModelId}
+          onOpenModelConfig={() => setModelDialogOpen(true)}
         />
         <ModelDialog
           open={modelDialogOpen}

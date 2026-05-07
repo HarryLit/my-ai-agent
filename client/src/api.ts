@@ -96,8 +96,6 @@ export function sendChatMessage(
         try {
           const event: StreamEvent = JSON.parse(line.slice(6))
           onEvent(event)
-          // Yield to let React render between tokens
-          await new Promise(r => setTimeout(r, 0))
         } catch {}
       }
     }

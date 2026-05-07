@@ -216,10 +216,10 @@ export default function MessageItem({ message, streamingContent, streamStats, is
       {showStats && (
         <div style={{ marginTop: 6, display: 'flex', gap: 6, flexWrap: 'wrap' }}>
             {input > 0 && (
-              <span className="stat-tag"><ArrowDownOutlined /> 输入 {input}</span>
+              <span className="stat-tag"><ArrowUpOutlined /> 输入 {input}</span>
             )}
             {output > 0 && (
-              <span className="stat-tag"><ArrowUpOutlined /> 输出 {output}</span>
+              <span className="stat-tag"><ArrowDownOutlined /> 输出 {output}</span>
             )}
           {wait > 0 && (
             <span className="stat-tag"><ClockCircleOutlined /> {wait}ms</span>

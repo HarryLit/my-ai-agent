@@ -47,6 +47,9 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
     if (!msgExisting.includes('model_name')) {
       this.db.run('ALTER TABLE messages ADD COLUMN model_name TEXT NOT NULL DEFAULT \'\'')
     }
+    if (!msgExisting.includes('thinking_time_ms')) {
+      this.db.run('ALTER TABLE messages ADD COLUMN thinking_time_ms INTEGER DEFAULT 0')
+    }
   }
 
   private initSchema() {
@@ -88,6 +91,7 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
         content TEXT NOT NULL DEFAULT '',
         reasoning_content TEXT NOT NULL DEFAULT '',
         model_name TEXT NOT NULL DEFAULT '',
+        thinking_time_ms INTEGER DEFAULT 0,
         input_tokens INTEGER DEFAULT 0,
         output_tokens INTEGER DEFAULT 0,
         wait_time_ms INTEGER DEFAULT 0,

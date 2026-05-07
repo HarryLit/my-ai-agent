@@ -46,6 +46,7 @@ export class ChatService {
       let outputTokens = 0
       let inputTokens = 0
       let reasoningContent = ''
+      let thinkingStartTime = 0
       const rawChunks: string[] = []
 
       this.convService.addMessage({ conversation_id: conversationId, role: 'user', content })
@@ -114,19 +115,7 @@ export class ChatService {
           const waitTime = firstTokenTime ? firstTokenTime - startTime : 0
           const elapsed = firstTokenTime ? (Date.now() - firstTokenTime) / 1000 : 1
           const speed = outputTokens / Math.max(elapsed, 0.01)
-
-          this.logger.logRound(conversationId, {
-            url: requestUrl,
-            headers: requestHeaders,
-            body: requestBody
-          }, {
-            content: accumulatedContent,
-            rawResponse: rawChunks.join('\n'),
-            inputTokens,
-            outputTokens,
-            waitTimeMs: waitTime,
-            outputSpeedTps: parseFloat(speed.toFixed(2))
-          })
+          const thinkingTimeMs = thinkingStartTime ? Date.now() - thinkingStartTime : 0
 
           this.convService.addMessage({
             conversation_id: conversationId,
@@ -134,6 +123,7 @@ export class ChatService {
             content: accumulatedContent,
             reasoning_content: reasoningContent,
             model_name: usedModelName,
+            thinking_time_ms: thinkingTimeMs,
             input_tokens: inputTokens,
             output_tokens: outputTokens,
             wait_time_ms: waitTime,
@@ -186,6 +176,7 @@ export class ChatService {
               }
 
               if (delta?.reasoning_content) {
+                if (!thinkingStartTime) thinkingStartTime = Date.now()
                 reasoningContent += delta.reasoning_content
                 observer.next({ type: 'thinking', content: delta.reasoning_content })
               }

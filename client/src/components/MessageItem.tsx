@@ -178,9 +178,9 @@ export default function MessageItem({ message, streamingContent, thinkingContent
               {thinkingCollapsed ? <RightOutlined /> : <DownOutlined />}
               <BulbOutlined style={{ color: '#d4a84b' }} />
               <span style={{ fontWeight: 600, color: '#b8860b' }}>思考</span>
-              {thinkingTime !== undefined && thinkingTime > 0 && (
+              {(message?.thinking_time_ms || thinkingTime || 0) > 0 && (
                 <span style={{ color: '#7a8fa8' }}>
-                  {(thinkingTime / 1000).toFixed(1)}s
+                  {((message?.thinking_time_ms || thinkingTime || 0) / 1000).toFixed(1)}s
                 </span>
               )}
               {(!!message?.reasoning_content || thinkingDone) && <span style={{ color: '#7a8fa8' }}>✓</span>}

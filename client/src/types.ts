@@ -31,6 +31,7 @@ export interface Message {
   content: string
   reasoning_content: string
   model_name: string
+  thinking_time_ms: number
   input_tokens: number
   output_tokens: number
   wait_time_ms: number

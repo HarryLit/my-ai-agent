@@ -10,6 +10,7 @@ export interface RequestInfo {
 
 export interface ResponseInfo {
   content: string
+  rawResponse: string
   inputTokens: number
   outputTokens: number
   waitTimeMs: number
@@ -64,6 +65,9 @@ export class ChatLogger {
       'CONTENT:',
       res.content,
       '',
+      'RAW RESPONSE:',
+      this.prettyPrint(res.rawResponse),
+      '',
       `INPUT_TOKENS: ${res.inputTokens}`,
       `OUTPUT_TOKENS: ${res.outputTokens}`,
       `WAIT_TIME_MS: ${res.waitTimeMs}`,
@@ -74,11 +78,12 @@ export class ChatLogger {
     fs.appendFileSync(filepath, sections.join('\n'), 'utf-8')
   }
 
-  private prettyPrint(jsonStr: string): string {
+  private prettyPrint(str: string): string {
     try {
-      return JSON.stringify(JSON.parse(jsonStr), null, 2)
+      const parsed = JSON.parse(str)
+      return JSON.stringify(parsed, null, 2)
     } catch {
-      return jsonStr
+      return str
     }
   }
 }

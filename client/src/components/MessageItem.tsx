@@ -228,44 +228,44 @@ export default function MessageItem({ message, streamingContent, thinkingContent
             </div>
           )
         )}
-        {!isUser && !isStreaming && content && (
-          <div style={{ marginTop: 6, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '4px 8px' }}>
-            {showStats && (
-              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-                {input > 0 && (
-                  <span className="stat-tag"><ArrowUpOutlined /> 输入 {input}</span>
-                )}
-                {output > 0 && (
-                  <span className="stat-tag"><ArrowDownOutlined /> 输出 {output}</span>
-                )}
-                {wait > 0 && (
-                  <span className="stat-tag"><ClockCircleOutlined /> {wait}ms</span>
-                )}
-                {speed > 0 && (
-                  <span className="stat-tag"><ThunderboltOutlined /> {speed.toFixed(1)}t/s</span>
-                )}
-              </div>
-            )}
-            {showStats && <div />}
-            <div style={{ display: 'flex', gap: 6 }}>
-              <span
-                onClick={() => setShowRaw(!showRaw)}
-                className="action-btn"
-                style={{ cursor: 'pointer', padding: '2px 6px', borderRadius: 4, fontSize: 12, color: '#7a8fa8', display: 'inline-flex', alignItems: 'center', gap: 3 }}
-              >
-                {showRaw ? <><FileTextOutlined /> 渲染</> : <><CodeOutlined /> 原文</>}
-              </span>
-              <span
-                onClick={handleCopy}
-                className="action-btn"
-                style={{ cursor: 'pointer', padding: '2px 6px', borderRadius: 4, fontSize: 12, color: '#7a8fa8', display: 'inline-flex', alignItems: 'center', gap: 3 }}
-              >
-                <CopyOutlined /> 复制
-              </span>
-            </div>
-          </div>
-        )}
       </div>
+      {!isUser && !isStreaming && content && (
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '4px 8px' }}>
+          {showStats && (
+            <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+              {input > 0 && (
+                <span className="stat-tag"><ArrowUpOutlined /> 输入 {input}</span>
+              )}
+              {output > 0 && (
+                <span className="stat-tag"><ArrowDownOutlined /> 输出 {output}</span>
+              )}
+              {wait > 0 && (
+                <span className="stat-tag"><ClockCircleOutlined /> {wait}ms</span>
+              )}
+              {speed > 0 && (
+                <span className="stat-tag"><ThunderboltOutlined /> {speed.toFixed(1)}t/s</span>
+              )}
+            </div>
+          )}
+          {showStats && <div />}
+          <div style={{ display: 'flex', gap: 6 }}>
+            <span
+              onClick={() => setShowRaw(!showRaw)}
+              className="action-btn"
+              style={{ cursor: 'pointer', padding: '2px 6px', borderRadius: 4, fontSize: 12, color: '#7a8fa8', display: 'inline-flex', alignItems: 'center', gap: 3 }}
+            >
+              {showRaw ? <><FileTextOutlined /> 渲染</> : <><CodeOutlined /> 原文</>}
+            </span>
+            <span
+              onClick={handleCopy}
+              className="action-btn"
+              style={{ cursor: 'pointer', padding: '2px 6px', borderRadius: 4, fontSize: 12, color: '#7a8fa8', display: 'inline-flex', alignItems: 'center', gap: 3 }}
+            >
+              <CopyOutlined /> 复制
+            </span>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

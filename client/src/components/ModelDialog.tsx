@@ -135,6 +135,7 @@ export default function ModelDialog({ open, models, onClose, onCreate, onUpdate,
       open={open}
       onCancel={onClose}
       footer={null}
+      maskClosable={false}
       width={720}
       title={
         <span style={{ fontSize: 16, fontWeight: 600, color: '#3d3226' }}>

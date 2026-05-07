@@ -230,7 +230,7 @@ export default function MessageItem({ message, streamingContent, thinkingContent
         )}
       </div>
       {!isUser && !isStreaming && content && (
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '4px 8px' }}>
+        <div style={{ marginTop: 8, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '4px 8px' }}>
           {showStats && (
             <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
               {input > 0 && (

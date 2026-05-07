@@ -169,7 +169,7 @@ export default function MessageItem({ message, streamingContent, thinkingContent
 
       <div className={isUser ? 'msg-user' : 'msg-ai'} style={{ width: '100%' }}>
         {/* Thinking / reasoning content */}
-        {!isUser && (thinkingContent || message?.reasoning_content || (isStreaming && !content)) && (
+        {!isUser && (thinkingContent || message?.reasoning_content) && (
           <div style={{ marginBottom: (thinkingContent || message?.reasoning_content) ? 10 : 0 }}>
             <div
               onClick={() => setThinkingCollapsed(!thinkingCollapsed)}

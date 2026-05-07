@@ -1,6 +1,5 @@
 import { Button } from 'antd'
 import { ClearOutlined } from '@ant-design/icons'
-import type { ModelConfig } from '../types'
 import MessageList from './MessageList'
 import InputArea from './InputArea'
 
@@ -12,19 +11,14 @@ interface ChatWindowProps {
   hasActiveConv: boolean
   hasActiveModel: boolean
   modelName: string
-  models: ModelConfig[]
-  activeModelId: string
   onSend: (content: string) => void
   onStop: () => void
   onClear: () => void
-  onModelChange: (id: string) => void
-  onOpenModelConfig: () => void
 }
 
 export default function ChatWindow({
   messages, streamingContent, streamStats, isStreaming,
-  hasActiveConv, hasActiveModel, modelName, models, activeModelId,
-  onSend, onStop, onClear, onModelChange, onOpenModelConfig
+  hasActiveConv, hasActiveModel, modelName, onSend, onStop, onClear
 }: ChatWindowProps) {
   const showClear = hasActiveConv && messages.length > 0 && !isStreaming
 
@@ -68,10 +62,6 @@ export default function ChatWindow({
         onStop={onStop}
         isStreaming={isStreaming}
         disabled={!hasActiveModel}
-        models={models}
-        activeModelId={activeModelId}
-        onModelChange={onModelChange}
-        onOpenModelConfig={onOpenModelConfig}
       />
     </div>
   )

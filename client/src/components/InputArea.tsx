@@ -1,7 +1,6 @@
-import { useState, useRef, useEffect } from 'react'
-import { Button, Input, Select } from 'antd'
-import { SendOutlined, CloseOutlined, SettingOutlined } from '@ant-design/icons'
-import type { ModelConfig } from '../types'
+import { useState } from 'react'
+import { Button, Input } from 'antd'
+import { SendOutlined, CloseOutlined } from '@ant-design/icons'
 
 const { TextArea } = Input
 
@@ -10,13 +9,9 @@ interface InputAreaProps {
   onStop: () => void
   isStreaming: boolean
   disabled: boolean
-  models: ModelConfig[]
-  activeModelId: string
-  onModelChange: (id: string) => void
-  onOpenModelConfig: () => void
 }
 
-export default function InputArea({ onSend, onStop, isStreaming, disabled, models, activeModelId, onModelChange, onOpenModelConfig }: InputAreaProps) {
+export default function InputArea({ onSend, onStop, isStreaming, disabled }: InputAreaProps) {
   const [text, setText] = useState('')
 
   const handleSend = () => {
@@ -71,29 +66,16 @@ export default function InputArea({ onSend, onStop, isStreaming, disabled, model
             }}
           />
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <div>
-            {isStreaming ? (
-              <Button danger icon={<CloseOutlined />} onClick={onStop} style={{ height: 38, borderRadius: 10, boxShadow: '0 2px 0 #a83232', fontWeight: 600, fontSize: 13, border: '1px solid #cc4444' }}>
-                停止
-              </Button>
-            ) : (
-              <Button type="primary" icon={<SendOutlined />} onClick={handleSend} disabled={disabled || !text.trim()} className="btn-skeuo" style={{ height: 38, borderRadius: 10, fontSize: 13, border: '1px solid #4a90d9' }}>
-                发送
-              </Button>
-            )}
-          </div>
-          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-            <Select
-              value={activeModelId || undefined}
-              onChange={onModelChange}
-              placeholder="选择模型"
-              options={models.map(m => ({ value: m.id, label: m.name }))}
-              style={{ minWidth: 160 }}
-              popupMatchSelectWidth={false}
-            />
-            <Button icon={<SettingOutlined />} onClick={onOpenModelConfig} size="small" />
-          </div>
+        <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
+          {isStreaming ? (
+            <Button danger icon={<CloseOutlined />} onClick={onStop} style={{ height: 38, borderRadius: 10, boxShadow: '0 2px 0 #a83232', fontWeight: 600, fontSize: 13, border: '1px solid #cc4444' }}>
+              停止
+            </Button>
+          ) : (
+            <Button type="primary" icon={<SendOutlined />} onClick={handleSend} disabled={disabled || !text.trim()} className="btn-skeuo" style={{ height: 38, borderRadius: 10, fontSize: 13, border: '1px solid #4a90d9' }}>
+              发送
+            </Button>
+          )}
         </div>
       </div>
     </div>

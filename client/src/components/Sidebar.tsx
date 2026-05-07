@@ -39,6 +39,32 @@ export default function Sidebar({
         </Button>
       </div>
 
+      <div style={{ padding: '12px 16px', borderBottom: '1px solid rgba(255,255,255,0.08)', display: 'flex', gap: 8, alignItems: 'center' }}>
+        <Select
+          value={activeModelId || undefined}
+          onChange={onModelChange}
+          style={{ flex: 1 }}
+          placeholder="选择模型"
+          options={models.map(m => ({ value: m.id, label: m.name }))}
+          className="model-select-dark"
+          popupMatchSelectWidth={false}
+        />
+        <Button
+          icon={<SettingOutlined />}
+          onClick={onOpenModelConfig}
+          style={{
+            background: 'rgba(255,255,255,0.08)',
+            border: '1px solid rgba(255,255,255,0.12)',
+            color: '#c8bda0',
+            height: 36,
+            width: 36,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}
+        />
+      </div>
+
       <div style={{ flex: 1, overflowY: 'auto', padding: '8px 0' }}>
         {conversations.map(conv => (
           <div
@@ -73,6 +99,15 @@ export default function Sidebar({
         .conv-item .conv-delete-btn { opacity: 0; }
         .conv-item:hover .conv-delete-btn { opacity: 0.7; }
         .conv-item .conv-delete-btn:hover { opacity: 1 !important; color: #ff6b6b !important; }
+        .model-select-dark .ant-select-selector {
+          background: rgba(255,255,255,0.06) !important;
+          border-color: rgba(255,255,255,0.12) !important;
+          color: #e0d8c8 !important;
+          height: 36px !important;
+          border-radius: 8px !important;
+        }
+        .model-select-dark .ant-select-selection-item { color: #e0d8c8 !important; line-height: 34px !important; }
+        .model-select-dark .ant-select-arrow { color: rgba(255,255,255,0.3) !important; }
       `}</style>
     </div>
   )

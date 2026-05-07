@@ -38,6 +38,7 @@ export class ChatService {
         observer.complete()
         return
       }
+      const usedModelName = model.name || model.model_name || ''
 
       const startTime = Date.now()
       let firstTokenTime: number | null = null
@@ -132,6 +133,7 @@ export class ChatService {
             role: 'assistant',
             content: accumulatedContent,
             reasoning_content: reasoningContent,
+            model_name: usedModelName,
             input_tokens: inputTokens,
             output_tokens: outputTokens,
             wait_time_ms: waitTime,

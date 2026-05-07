@@ -30,6 +30,7 @@ export interface Message {
   role: 'user' | 'assistant'
   content: string
   reasoning_content: string
+  model_name: string
   input_tokens: number
   output_tokens: number
   wait_time_ms: number

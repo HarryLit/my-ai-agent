@@ -150,7 +150,7 @@ export default function MessageItem({ message, streamingContent, thinkingContent
   const wait = message ? message.wait_time_ms : streamStats?.waitTimeMs ?? 0
   const speed = message ? message.output_speed_tps : streamStats?.outputSpeedTps ?? 0
 
-  const roleLabel = isUser ? '你' : (modelName || 'AI')
+  const roleLabel = isUser ? '你' : (message?.model_name || modelName || 'AI')
 
   const handleCopy = useCallback(() => {
     navigator.clipboard.writeText(content).catch(() => {})

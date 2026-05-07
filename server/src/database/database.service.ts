@@ -44,6 +44,9 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
     if (!msgExisting.includes('reasoning_content')) {
       this.db.run('ALTER TABLE messages ADD COLUMN reasoning_content TEXT NOT NULL DEFAULT \'\'')
     }
+    if (!msgExisting.includes('model_name')) {
+      this.db.run('ALTER TABLE messages ADD COLUMN model_name TEXT NOT NULL DEFAULT \'\'')
+    }
   }
 
   private initSchema() {
@@ -84,6 +87,7 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
         role TEXT NOT NULL CHECK(role IN ('user', 'assistant')),
         content TEXT NOT NULL DEFAULT '',
         reasoning_content TEXT NOT NULL DEFAULT '',
+        model_name TEXT NOT NULL DEFAULT '',
         input_tokens INTEGER DEFAULT 0,
         output_tokens INTEGER DEFAULT 0,
         wait_time_ms INTEGER DEFAULT 0,

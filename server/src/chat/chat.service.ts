@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common'
 import { Observable, Observer } from 'rxjs'
 import { ConversationsService } from '../conversations/conversations.service'
 import { ModelsService, ModelConfig } from '../models/models.service'
+import { ChatLogger } from './chat-logger.service'
 
 export interface StreamEvent {
   type: 'token' | 'thinking' | 'done' | 'error'
@@ -18,7 +19,8 @@ export interface StreamEvent {
 export class ChatService {
   constructor(
     private convService: ConversationsService,
-    private modelsService: ModelsService
+    private modelsService: ModelsService,
+    private logger: ChatLogger
   ) {}
 
   sendMessage(conversationId: string, content: string): Observable<StreamEvent> {
@@ -44,6 +46,8 @@ export class ChatService {
       let inputTokens = 0
 
       this.convService.addMessage({ conversation_id: conversationId, role: 'user', content })
+
+      this.logger.write(conversationId, 'user', content)
 
       const history = this.convService.getMessages(conversationId)
       const messages = history.map(m => ({ role: m.role, content: m.content }))
@@ -104,6 +108,8 @@ export class ChatService {
           const waitTime = firstTokenTime ? firstTokenTime - startTime : 0
           const elapsed = firstTokenTime ? (Date.now() - firstTokenTime) / 1000 : 1
           const speed = outputTokens / Math.max(elapsed, 0.01)
+
+          this.logger.write(conversationId, 'assistant', accumulatedContent)
 
           this.convService.addMessage({
             conversation_id: conversationId,

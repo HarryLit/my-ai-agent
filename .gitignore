@@ -3,6 +3,7 @@ dist/
 .env
 *.log
 server/data/
+data/logs/
 *.db
 ai-agent-session.md
 .DS_Store

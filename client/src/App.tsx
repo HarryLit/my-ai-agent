@@ -14,12 +14,9 @@ export default function App() {
   const [modelDialogOpen, setModelDialogOpen] = useState(false)
 
   const activeModelName = useMemo(() => {
-    if (!conversations.activeConvId) return ''
-    const conv = conversations.conversations.find(c => c.id === conversations.activeConvId)
-    if (!conv) return ''
-    const model = models.models.find(m => m.id === conv.model_id)
-    return model?.name || model?.model_name || model?.id || ''
-  }, [conversations.activeConvId, conversations.conversations, models.models])
+    const model = models.models.find(m => m.id === models.activeModelId)
+    return model?.name || model?.model_name || ''
+  }, [models.models, models.activeModelId])
 
   useEffect(() => {
     if (conversations.activeConvId) {

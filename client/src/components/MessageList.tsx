@@ -37,7 +37,7 @@ export default function MessageList({ messages, streamingContent, thinkingConten
     scrollToBottom()
   }, [])
 
-  // Scroll on updates: capture position before data changes
+  // Scroll on updates
   useLayoutEffect(() => {
     if (isStreaming && !prevStreamingRef.current) {
       isNearBottomRef.current = true
@@ -47,7 +47,7 @@ export default function MessageList({ messages, streamingContent, thinkingConten
     if (isNearBottomRef.current) {
       scrollToBottom()
     }
-  }, [messages, streamingContent, isStreaming])
+  }, [messages, streamingContent, thinkingContent, isStreaming])
 
   return (
     <div

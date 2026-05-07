@@ -47,7 +47,6 @@ export class ChatService {
       let inputTokens = 0
       let reasoningContent = ''
       let thinkingStartTime = 0
-      const rawChunks: string[] = []
 
       this.convService.addMessage({ conversation_id: conversationId, role: 'user', content })
 
@@ -162,7 +161,6 @@ export class ChatService {
             }
 
             try {
-              rawChunks.push(data)
               const parsed = JSON.parse(data)
               const choice = parsed.choices?.[0]
               const delta = choice?.delta

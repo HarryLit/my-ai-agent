@@ -10,7 +10,7 @@ export interface RequestInfo {
 
 export interface ResponseInfo {
   content: string
-  rawResponse: string
+  reasoningContent: string
   inputTokens: number
   outputTokens: number
   waitTimeMs: number
@@ -62,11 +62,11 @@ export class ChatLogger {
       sep,
       `[${ts}] RESPONSE`,
       sep,
+      'REASONING_CONTENT:',
+      res.reasoningContent,
+      '',
       'CONTENT:',
       res.content,
-      '',
-      'RAW RESPONSE:',
-      this.prettyPrint(res.rawResponse),
       '',
       `INPUT_TOKENS: ${res.inputTokens}`,
       `OUTPUT_TOKENS: ${res.outputTokens}`,

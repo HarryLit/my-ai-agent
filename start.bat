@@ -21,4 +21,5 @@ start http://localhost:5173
 echo.
 echo Both server and client are running.
 echo Close the two console windows to stop.
-pause
+
+exit 0

@@ -40,8 +40,8 @@ export class ChatService {
       }
       const usedModelName = model.name || model.model_name || ''
 
-      const startTime = Date.now()
-      let firstTokenTime: number | null = null
+      const requestStartTime = Date.now()
+      let firstResponseTime: number | null = null
       let accumulatedContent = ''
       let outputTokens = 0
       let inputTokens = 0
@@ -100,6 +100,7 @@ export class ChatService {
           observer.complete()
           return
         }
+        firstResponseTime = Date.now()
 
         const reader = res.body?.getReader()
         if (!reader) {
@@ -112,8 +113,8 @@ export class ChatService {
         let buffer = ''
 
         const finish = () => {
-          const waitTime = firstTokenTime ? firstTokenTime - startTime : 0
-          const elapsed = firstTokenTime ? (Date.now() - firstTokenTime) / 1000 : 1
+          const waitTime = firstResponseTime ? firstResponseTime - requestStartTime : 0
+          const elapsed = firstResponseTime ? (Date.now() - firstResponseTime) / 1000 : 1
           const speed = outputTokens / Math.max(elapsed, 0.01)
           const thinkingTimeMs = thinkingStartTime ? Date.now() - thinkingStartTime : 0
 
@@ -182,8 +183,13 @@ export class ChatService {
               const delta = choice?.delta
               const finishReason = choice?.finish_reason
 
+              if (delta?.reasoning_content) {
+                if (!thinkingStartTime) thinkingStartTime = Date.now()
+                reasoningContent += delta.reasoning_content
+                observer.next({ type: 'thinking', content: delta.reasoning_content })
+              }
+
               if (delta?.content) {
-                if (!firstTokenTime) firstTokenTime = Date.now()
                 accumulatedContent += delta.content
                 outputTokens = Math.ceil(accumulatedContent.length / 4)
                 observer.next({ type: 'token', content: delta.content, tokens: outputTokens })

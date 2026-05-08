@@ -116,6 +116,19 @@ export class ChatService {
           const speed = outputTokens / Math.max(elapsed, 0.01)
           const thinkingTimeMs = thinkingStartTime ? Date.now() - thinkingStartTime : 0
 
+          this.logger.logRound(conversationId, {
+            url: requestUrl,
+            headers: requestHeaders,
+            body: requestBody
+          }, {
+            content: accumulatedContent,
+            reasoningContent,
+            inputTokens,
+            outputTokens,
+            waitTimeMs: waitTime,
+            outputSpeedTps: parseFloat(speed.toFixed(2))
+          })
+
           this.convService.addMessage({
             conversation_id: conversationId,
             role: 'assistant',

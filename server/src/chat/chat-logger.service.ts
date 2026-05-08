@@ -29,9 +29,11 @@ export class ChatLogger {
   private config: LogConfig
 
   constructor() {
-    const configPath = path.resolve(process.cwd(), 'config', 'log-config.json')
+    const configPath = path.resolve(process.cwd(), 'config', 'log-config.jsonc')
     try {
-      this.config = JSON.parse(fs.readFileSync(configPath, 'utf-8'))
+      const raw = fs.readFileSync(configPath, 'utf-8')
+      const stripped = raw.replace(/\/\/.*$|\/\*[\s\S]*?\*\//gm, '')
+      this.config = JSON.parse(stripped)
     } catch {
       this.config = { enabled: true, logRawResponse: false }
     }

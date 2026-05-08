@@ -11,21 +11,38 @@ export interface RequestInfo {
 export interface ResponseInfo {
   content: string
   reasoningContent: string
+  rawResponse: string
   inputTokens: number
   outputTokens: number
   waitTimeMs: number
   outputSpeedTps: number
 }
 
+interface LogConfig {
+  enabled: boolean
+  logRawResponse: boolean
+}
+
 export class ChatLogger {
   private logDir: string
   private files = new Map<string, string>()
+  private config: LogConfig
 
   constructor() {
+    const configPath = path.resolve(process.cwd(), 'config', 'log-config.json')
+    try {
+      this.config = JSON.parse(fs.readFileSync(configPath, 'utf-8'))
+    } catch {
+      this.config = { enabled: true, logRawResponse: false }
+    }
     this.logDir = path.resolve(process.cwd(), 'data', 'logs')
     if (!fs.existsSync(this.logDir)) {
       fs.mkdirSync(this.logDir, { recursive: true })
     }
+  }
+
+  isEnabled(): boolean {
+    return this.config.enabled
   }
 
   private getFile(conversationId: string): string {
@@ -41,6 +58,8 @@ export class ChatLogger {
   }
 
   logRound(conversationId: string, req: RequestInfo, res: ResponseInfo) {
+    if (!this.config.enabled) return
+
     const filepath = this.getFile(conversationId)
     const ts = new Date().toISOString()
     const sep = '='.repeat(72)
@@ -52,7 +71,7 @@ export class ChatLogger {
       '',
       'HEADERS:',
       ...Object.entries(req.headers).map(([k, v]) => {
-        if (k.toLowerCase() === 'authorization') v = v.slice(0, 8) + '...' // mask api key
+        if (k.toLowerCase() === 'authorization') v = v.slice(0, 8) + '...'
         return `  ${k}: ${v}`
       }),
       '',
@@ -68,6 +87,11 @@ export class ChatLogger {
       'CONTENT:',
       res.content,
       '',
+      ...(this.config.logRawResponse ? [
+        'RAW RESPONSE:',
+        res.rawResponse,
+        '',
+      ] : []),
       `INPUT_TOKENS: ${res.inputTokens}`,
       `OUTPUT_TOKENS: ${res.outputTokens}`,
       `WAIT_TIME_MS: ${res.waitTimeMs}`,

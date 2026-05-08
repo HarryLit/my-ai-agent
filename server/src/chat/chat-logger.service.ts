@@ -38,9 +38,14 @@ export class ChatLogger {
     const configPath = path.resolve(process.cwd(), 'config', 'log-config.jsonc')
     try {
       const raw = fs.readFileSync(configPath, 'utf-8')
-      const stripped = raw.replace(/\/\/.*$|\/\*[\s\S]*?\*\//gm, '')
-      return JSON.parse(stripped)
-    } catch {
+      const stripped = raw.replace(/\/\/[^\n]*/g, '').replace(/\/\*[\s\S]*?\*\//g, '')
+      const config = JSON.parse(stripped) as LogConfig
+      if (process.env.DEBUG_LOG) {
+        console.log('[ChatLogger] config loaded:', JSON.stringify(config))
+      }
+      return config
+    } catch (e) {
+      console.error('[ChatLogger] failed to load config:', e)
       return { enabled: true, logRawResponse: false }
     }
   }

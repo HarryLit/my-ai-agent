@@ -73,6 +73,7 @@ export default function Sidebar({
         .conv-item .conv-delete-btn { opacity: 0; }
         .conv-item:hover .conv-delete-btn { opacity: 0.7; }
         .conv-item .conv-delete-btn:hover { opacity: 1 !important; color: #ff6b6b !important; }
+        .conv-item.active:hover { background: rgba(255,255,255,0.16) !important; }
       `}</style>
     </div>
   )

@@ -21,6 +21,8 @@ export default function App() {
   useEffect(() => {
     if (conversations.activeConvId) {
       chat.loadMessages(conversations.activeConvId)
+    } else {
+      chat.clear(conversations.activeConvId)
     }
   }, [conversations.activeConvId])
 

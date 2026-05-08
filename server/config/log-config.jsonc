@@ -2,5 +2,5 @@
   // 是否启用日志记录
   "enabled": true,
   // 是否在日志中打印原始 API 响应 (raw SSE data)
-  "logRawResponse": true,
+  "logRawResponse": true
 }

@@ -1,6 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { randomBytes } from 'crypto';
+import { parse as parseJsonc } from 'jsonc-parser';
 
 export interface RequestInfo {
   url: string;
@@ -41,13 +42,8 @@ export class ChatLogger {
       'log-config.jsonc',
     );
     try {
-      const raw = fs.readFileSync(configPath, 'utf-8');
-      const stripped = raw
-        .replace(/\/\/[^\n]*/g, '')
-        .replace(/\/\*[\s\S]*?\*\//g, '')
-        .replace(/,\s*}/g, '}')
-        .replace(/,\s*]/g, ']');
-      const config = JSON.parse(stripped) as LogConfig;
+      const raw = fs.readFileSync(configPath, 'utf-8')
+      const config = parseJsonc(raw) as LogConfig
       if (process.env.DEBUG_LOG) {
         console.log('[ChatLogger] config loaded:', JSON.stringify(config));
       }

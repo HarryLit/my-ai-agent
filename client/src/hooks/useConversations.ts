@@ -12,6 +12,7 @@ export function useConversations() {
     if (list.length > 0 && !list.find(c => c.id === activeConvId)) {
       setActiveConvId(list[0].id)
     }
+    return list
   }, [activeConvId])
 
   useEffect(() => { load() }, [])

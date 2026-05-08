@@ -21,10 +21,15 @@ export default function App() {
   useEffect(() => {
     if (conversations.activeConvId) {
       chat.loadMessages(conversations.activeConvId)
-    } else {
-      chat.clear(conversations.activeConvId)
     }
   }, [conversations.activeConvId])
+
+  // Auto-create conversation if none exist
+  useEffect(() => {
+    if (models.activeModelId && conversations.conversations.length === 0) {
+      conversations.create(models.activeModelId)
+    }
+  }, [conversations.conversations.length, models.activeModelId])
 
   const handleSend = (content: string) => {
     if (!conversations.activeConvId || !models.activeModelId) return
